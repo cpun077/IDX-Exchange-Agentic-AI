@@ -1,0 +1,152 @@
+[
+  {
+    "id": 1,
+    "status": "pass",
+    "actual": {
+      "city": "Berkeley",
+      "maxPrice": null,
+      "beds": null,
+      "baths": null,
+      "sqft": null,
+      "type": "SingleFamilyResidence",
+      "pool": null,
+      "hasView": null
+    },
+    "unrepresented_criteria": "Approximate $1.5M budget and quiet location are preferences, not strict filters."
+  },
+  {
+    "id": 2,
+    "status": "pass",
+    "actual": {
+      "city": "Oakland",
+      "maxPrice": null,
+      "beds": 2,
+      "baths": null,
+      "sqft": null,
+      "type": "Condominium",
+      "pool": null,
+      "hasView": null
+    },
+    "unrepresented_criteria": "“Nice” and “not too expensive” are not quantifiable."
+  },
+  {
+    "id": 3,
+    "status": "pass",
+    "actual": {
+      "city": "Fremont",
+      "maxPrice": null,
+      "beds": 3,
+      "baths": 2,
+      "sqft": null,
+      "type": null,
+      "pool": null,
+      "hasView": null
+    },
+    "unrepresented_criteria": "“Enough space for our kids” is not quantifiable."
+  },
+  {
+    "id": 4,
+    "status": "pass",
+    "actual": {
+      "city": "San Jose",
+      "maxPrice": 900000,
+      "beds": null,
+      "baths": null,
+      "sqft": null,
+      "type": "Townhouse",
+      "pool": null,
+      "hasView": null
+    },
+    "unrepresented_criteria": "Garage is an optional preference and unsupported."
+  },
+  {
+    "id": 5,
+    "status": "pass",
+    "actual": {
+      "city": "Irvine",
+      "maxPrice": null,
+      "beds": null,
+      "baths": null,
+      "sqft": null,
+      "type": "SingleFamilyResidence",
+      "pool": null,
+      "hasView": null
+    },
+    "unrepresented_criteria": "Backyard is required but unsupported; pool is optional and not required."
+  },
+  {
+    "id": 6,
+    "status": "pass",
+    "actual": {
+      "city": "Albany",
+      "maxPrice": null,
+      "beds": 3,
+      "baths": null,
+      "sqft": null,
+      "type": null,
+      "pool": null,
+      "hasView": null
+    },
+    "unrepresented_criteria": "“Around 1,800 sqft” is approximate and is not a minimum."
+  },
+  {
+    "id": 7,
+    "status": "pass",
+    "actual": {
+      "city": "Newport Beach",
+      "maxPrice": null,
+      "beds": null,
+      "baths": null,
+      "sqft": null,
+      "type": "Condominium",
+      "pool": null,
+      "hasView": "True"
+    },
+    "unrepresented_criteria": "“Ideally under $2M” is optional; ocean view is required."
+  },
+  {
+    "id": 8,
+    "status": "pass",
+    "actual": {
+      "city": "Walnut Creek",
+      "maxPrice": null,
+      "beds": 4,
+      "baths": 3,
+      "sqft": null,
+      "type": "SingleFamilyResidence",
+      "pool": null,
+      "hasView": null
+    },
+    "unrepresented_criteria": "Proximity to good schools is optional and unsupported."
+  },
+  {
+    "id": 9,
+    "status": "pass",
+    "actual": {
+      "city": null,
+      "maxPrice": null,
+      "beds": null,
+      "baths": null,
+      "sqft": null,
+      "type": "UnimprovedLand",
+      "pool": null,
+      "hasView": null
+    },
+    "unrepresented_criteria": "“Around Sacramento” needs clarification: city proper versus surrounding areas."
+  },
+  {
+    "id": 10,
+    "status": "pass",
+    "actual": {
+      "city": "Richmond",
+      "maxPrice": 1000000,
+      "beds": null,
+      "baths": null,
+      "sqft": null,
+      "type": null,
+      "pool": null,
+      "hasView": null
+    },
+    "unrepresented_criteria": "Condition/renovation preference is optional and unsupported."
+  }
+]

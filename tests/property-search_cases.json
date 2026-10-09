@@ -1,0 +1,152 @@
+[
+  {
+    "id": 1,
+    "input": "I'm looking for a house in Berkeley, preferably somewhere quiet, and my budget is around $1.5 million.",
+    "expected": {
+      "city": "Berkeley",
+      "maxPrice": null,
+      "beds": null,
+      "baths": null,
+      "sqft": null,
+      "type": "SingleFamilyResidence",
+      "pool": null,
+      "hasView": null
+    },
+    "clarification_policy": "Approximate $1.5M budget and quiet location are preferences, not strict filters."
+  },
+  {
+    "id": 2,
+    "input": "Are there any nice condos in Oakland that have at least two bedrooms and aren't too expensive?",
+    "expected": {
+      "city": "Oakland",
+      "maxPrice": null,
+      "beds": 2,
+      "baths": null,
+      "sqft": null,
+      "type": "Condominium",
+      "pool": null,
+      "hasView": null
+    },
+    "clarification_policy": "“Nice” and “not too expensive” are not quantifiable."
+  },
+  {
+    "id": 3,
+    "input": "My wife and I are looking for a place in Fremont with three bedrooms, two bathrooms, and enough space for our kids.",
+    "expected": {
+      "city": "Fremont",
+      "maxPrice": null,
+      "beds": 3,
+      "baths": 2,
+      "sqft": null,
+      "type": null,
+      "pool": null,
+      "hasView": null
+    },
+    "clarification_policy": "“Enough space for our kids” is not quantifiable."
+  },
+  {
+    "id": 4,
+    "input": "Can you find me a townhouse in San Jose for less than $900k? A garage would be nice too.",
+    "expected": {
+      "city": "San Jose",
+      "maxPrice": 900000,
+      "beds": null,
+      "baths": null,
+      "sqft": null,
+      "type": "Townhouse",
+      "pool": null,
+      "hasView": null
+    },
+    "clarification_policy": "Garage is an optional preference and unsupported."
+  },
+  {
+    "id": 5,
+    "input": "I'm hoping to buy a single-family home in Irvine with a backyard and maybe a pool, but the pool isn't a dealbreaker.",
+    "expected": {
+      "city": "Irvine",
+      "maxPrice": null,
+      "beds": null,
+      "baths": null,
+      "sqft": null,
+      "type": "SingleFamilyResidence",
+      "pool": null,
+      "hasView": null
+    },
+    "clarification_policy": "Backyard is required but unsupported; pool is optional and not required."
+  },
+  {
+    "id": 6,
+    "input": "Do you have anything in Albany that's around 1,800 square feet and has at least three bedrooms?",
+    "expected": {
+      "city": "Albany",
+      "maxPrice": null,
+      "beds": 3,
+      "baths": null,
+      "sqft": null,
+      "type": null,
+      "pool": null,
+      "hasView": null
+    },
+    "clarification_policy": "“Around 1,800 sqft” is approximate and is not a minimum."
+  },
+  {
+    "id": 7,
+    "input": "I'd love a condo in Newport Beach with an ocean view, ideally under $2 million.",
+    "expected": {
+      "city": "Newport Beach",
+      "maxPrice": null,
+      "beds": null,
+      "baths": null,
+      "sqft": null,
+      "type": "Condominium",
+      "pool": null,
+      "hasView": "True"
+    },
+    "clarification_policy": "“Ideally under $2M” is optional; ocean view is required."
+  },
+  {
+    "id": 8,
+    "input": "We're looking to move to Walnut Creek and want a four-bedroom house with at least three bathrooms, preferably close to good schools.",
+    "expected": {
+      "city": "Walnut Creek",
+      "maxPrice": null,
+      "beds": 4,
+      "baths": 3,
+      "sqft": null,
+      "type": "SingleFamilyResidence",
+      "pool": null,
+      "hasView": null
+    },
+    "clarification_policy": "Proximity to good schools is optional and unsupported."
+  },
+  {
+    "id": 9,
+    "input": "I'm interested in buying some land around Sacramento where I could eventually build a house.",
+    "expected": {
+      "city": null,
+      "maxPrice": null,
+      "beds": null,
+      "baths": null,
+      "sqft": null,
+      "type": "UnimprovedLand",
+      "pool": null,
+      "hasView": null
+    },
+    "clarification_policy": "“Around Sacramento” needs clarification: city proper versus surrounding areas."
+  },
+  {
+    "id": 10,
+    "input": "Can you show me some homes in Richmond that are under a million dollars? I'd really prefer something that doesn't need a ton of work.",
+    "expected": {
+      "city": "Richmond",
+      "maxPrice": 1000000,
+      "beds": null,
+      "baths": null,
+      "sqft": null,
+      "type": null,
+      "pool": null,
+      "hasView": null
+    },
+    "clarification_policy": "Condition/renovation preference is optional and unsupported."
+  }
+]
