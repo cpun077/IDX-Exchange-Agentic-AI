@@ -28,8 +28,8 @@ export function parsePropertyQuery(query: string) {
         baths: Number(match(/(\d+(?:\.\d+)?)\s*[\s+-]*bath/i)) || null,
         sqft: Number(match(/([\d,]+)\+?\s*(?:sqft|sq ft|square feet)/i)?.replace(/,/g, "")) || null,
         type: type ? types[type] : null,
-        pool: /\bwith (?:a |an )?pool\b/i.test(query) ? "True" : null,
-        hasView: /\bwith (?:a |an )?view\b/i.test(query) ? "True" : null
+        pool: /\bwith (?:a |an )?pool\b/i.test(query) ? "1" : null,
+        hasView: /\bwith (?:a |an )?view\b/i.test(query) ? "1" : null
     };
 
     return {
@@ -41,5 +41,5 @@ export function parsePropertyQuery(query: string) {
 }
 
 // testing
-const query = "Find homes in Berkeley under $1.5M";
-console.log(JSON.stringify(parsePropertyQuery(query), null, 2));
+// const query = "Find homes in Berkeley under $1.5M";
+// console.log(JSON.stringify(parsePropertyQuery(query), null, 2));
