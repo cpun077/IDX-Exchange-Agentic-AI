@@ -11,6 +11,6 @@
     "esModuleInterop": true,
     "skipLibCheck": true
   },
-  "include": ["skills/**/*.ts", "mcp-server/**/*.ts"],
+  "include": ["skills/**/*.ts", "mcp-server/**/*.ts", "tests/test_queries.ts", "tests/test_mcp.ts"],
   "exclude": ["node_modules"]
 }

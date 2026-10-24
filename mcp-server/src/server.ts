@@ -1,7 +1,9 @@
 import { McpServer } from "@modelcontextprotocol/server";
 import { StdioServerTransport } from "@modelcontextprotocol/server/stdio";
 import { z } from "zod/v4";
-import { searchActiveListings, getSoldComps } from "../../skills/property-search/query_db.js";
+import { searchActiveListings, getSoldComps } from "../../skills/property-search/scripts/query_db.js";
+import { getSession, updateSession, clearSession, saveResults } from "../../skills/property-search/scripts/user_session.js";
+import { parsePropertyQuery } from "../../skills/property-search/scripts/text_parser.js";
 
 const server = new McpServer({ name: "property-search", version: "1.0.0" });
 
@@ -12,45 +14,43 @@ const VALID_TYPES = [
   "UnimprovedLand",
 ] as const;
 
+
+
 server.registerTool(
   "search_active_listings",
   {
-    description:
-      "Search active MLS property listings in rets_property with optional filters, pagination, and price-ascending ordering.",
+    description: "Search active MLS listings using session filters and save results.",
     inputSchema: z.object({
-      filters: z.object({
-        city: z.string().optional(),
-        maxPrice: z.number().nonnegative().finite().optional(),
-        beds: z.number().nonnegative().finite().optional(),
-        baths: z.number().nonnegative().finite().optional(),
-        sqft: z.number().nonnegative().finite().optional(),
-        type: z.enum(VALID_TYPES).optional(),
-        pool: z.string().optional(),
-        hasView: z.string().optional(),
-      }),
+      sessionId: z.string(),
       page: z.number().int().positive().default(1),
       limit: z.number().int().positive().max(50).default(10),
     }),
   },
-  async ({ filters, page, limit }) => {
+  async ({ sessionId, page, limit }) => {
     try {
-      const rows = await searchActiveListings(filters, page, limit);
+      const rows = await searchActiveListings(
+        getSession(sessionId).filters,
+        page,
+        limit
+      );
+
+      saveResults(sessionId, rows);
+
       return {
         content: [{ type: "text" as const, text: JSON.stringify(rows, null, 2) }],
       };
     } catch (err) {
       return {
         isError: true,
-        content: [
-          {
-            type: "text" as const,
-            text: `Database error: ${err instanceof Error ? err.message : "unknown error"}`,
-          },
-        ],
+        content: [{
+          type: "text" as const,
+          text: `Database error: ${err instanceof Error ? err.message : "unknown error"}`,
+        }],
       };
     }
   }
 );
+
 
 server.registerTool(
   "get_sold_comps",
@@ -75,6 +75,92 @@ server.registerTool(
           {
             type: "text" as const,
             text: `Database error: ${err instanceof Error ? err.message : "unknown error"}`,
+          },
+        ],
+      };
+    }
+  }
+);
+
+server.registerTool(
+  "get_session",
+  {
+    description: "Get or initialize a user session with current filters and search results.",
+    inputSchema: z.object({
+      sessionId: z.string(),
+    }),
+  },
+  async ({ sessionId }) => {
+    try {
+      const session = getSession(sessionId);
+      return {
+        content: [{ type: "text" as const, text: JSON.stringify(session, null, 2) }],
+      };
+    } catch (err) {
+      return {
+        isError: true,
+        content: [
+          {
+            type: "text" as const,
+            text: `Session error: ${err instanceof Error ? err.message : "unknown error"}`,
+          },
+        ],
+      };
+    }
+  }
+);
+
+server.registerTool(
+  "update_session",
+  {
+    description: "Update a user session with new filters and remove specified filter keys.",
+    inputSchema: z.object({
+      sessionId: z.string(),
+      queryText: z.string(),
+    }),
+  },
+  async ({ sessionId, queryText }) => {
+    try {
+      const parsed = parsePropertyQuery(queryText);
+      const session = updateSession(sessionId, parsed);
+      return {
+        content: [{ type: "text" as const, text: JSON.stringify(session, null, 2) }],
+      };
+    } catch (err) {
+      return {
+        isError: true,
+        content: [
+          {
+            type: "text" as const,
+            text: `Session error: ${err instanceof Error ? err.message : "unknown error"}`,
+          },
+        ],
+      };
+    }
+  }
+);
+
+server.registerTool(
+  "clear_session",
+  {
+    description: "Clear and delete a user session.",
+    inputSchema: z.object({
+      sessionId: z.string(),
+    }),
+  },
+  async ({ sessionId }) => {
+    try {
+      clearSession(sessionId);
+      return {
+        content: [{ type: "text" as const, text: `Session ${sessionId} cleared successfully.` }],
+      };
+    } catch (err) {
+      return {
+        isError: true,
+        content: [
+          {
+            type: "text" as const,
+            text: `Session error: ${err instanceof Error ? err.message : "unknown error"}`,
           },
         ],
       };

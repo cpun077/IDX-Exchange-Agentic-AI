@@ -32,11 +32,23 @@ export function parsePropertyQuery(query: string) {
         hasView: /\bwith (?:a |an )?view\b/i.test(query) ? "1" : null
     };
 
+    const remove = ([
+        ["maxPrice", /(?:remove|clear|no)\s+(?:the\s+)?(?:budget|price limit)/i],
+        ["beds", /(?:remove|clear)\s+(?:the\s+)?bedrooms?/i],
+        ["baths", /(?:remove|clear)\s+(?:the\s+)?bathrooms?/i],
+        ["pool", /(?:remove|clear)\s+(?:the\s+)?pool/i],
+        ["hasView", /(?:remove|clear)\s+(?:the\s+)?view/i],
+        ["type", /(?:remove|clear)\s+(?:the\s+)?(?:property\s+)?type/i],
+        ["sqft", /(?:remove|clear)\s+(?:the\s+)?(?:size|sqft)/i],
+        ["city", /(?:remove|clear)\s+(?:the\s+)?(?:city|location)/i]
+    ] as const).filter(([, regex]) => regex.test(query)).map(([key]) => key);
+
     return {
         status: /\b(exactly|only|preferably|ideally|around|about|between|at least|at most|without|no pool|no view|affordable|cheap)\b/i.test(query)
             ? "needs_interpretation"
             : "complete",
-        filters
+        filters,
+        remove
     };
 }
 

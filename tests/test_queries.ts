@@ -1,4 +1,4 @@
-import { searchActiveListings, getSoldComps } from "./query_db.js";
+import { searchActiveListings, getSoldComps } from "../skills/property-search/scripts/query_db.js";
 
 async function main() {
   console.log("=== Test 1: Active listings in Irvine, max $1.5M, 3+ beds ===");
