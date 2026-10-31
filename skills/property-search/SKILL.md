@@ -1,63 +1,67 @@
 ---
 name: property-search
-description: Conversational MLS search with persistent filters and listing memory.
+description: Conversational MLS search, listing memory, and market statistics.
 ---
 
 # Property Search
 
-Search MLS listings conversationally using MCP tools. Preserve filters and results across messages.
+Use MCP tools for MLS searches and market analytics.
 
 ## Workflow
 
 1. Use the current conversation ID as `sessionId`.
-2. Call `get_session(sessionId)` to retrieve filters and previous results.
-3. For new or modified search constraints, call `update_session({sessionId, queryText})`. Parsing and merging happen internally.
-4. Search using:
-   - `search_active_listings({sessionId, page?, limit?})` — uses saved filters and automatically replaces `lastResults`.
-   - `get_sold_comps({city, months?})` — sold history.
-5. Format results for the user.
-6. For "start over" or "reset", call `clear_session(sessionId)`.
+2. For listing searches, call `get_session({sessionId})`.
+3. For new or changed filters, call `update_session({sessionId, queryText})`.
+4. Select the appropriate tool:
+   - `search_active_listings({sessionId, page?, limit?})` — active listings; updates `lastResults`.
+   - `get_sold_comps({city, months?})` — sold listings.
+   - `get_city_market_summary({city})` — 12-month market statistics.
+   - `get_price_trend({city, months?})` — monthly trends (default 24 months).
+5. Format MCP results for the user.
+6. On reset, call `clear_session({sessionId})`.
 
 ## Session Rules
 
-- Reuse `sessionId` within a conversation; isolate separate conversations.
-- Preserve unspecified filters; override changed values; remove explicitly cleared constraints.
-- Pass the user's original message to `update_session` when possible.
-- Use LLM interpretation for contextual or ambiguous requests.
-- Do not call `update_session` for questions about existing results.
-- Use `lastResults` for references like "the second listing" (1-based indexing).
-- Do not search again when saved results suffice.
-- `conversationStep` counts session updates, not messages.
-- Ask for clarification only when ambiguity materially affects the search.
-- Never invent or silently discard required constraints.
+- Reuse `sessionId` within a conversation; isolate conversations.
+- Preserve unspecified filters; update changed or explicitly cleared filters.
+- Pass original user text to `update_session` when possible.
+- Do not update sessions for market questions or questions about existing results.
+- Use `lastResults` for ordinal references (1-based); avoid unnecessary searches.
+- Interpret contextual requests; clarify material ambiguity.
+- `conversationStep` counts updates, not messages.
 
 ## Filters
 
 `city`, `maxPrice`, `beds`, `baths`, `sqft`, `type`, `pool`, `hasView`
 
-- `beds`, `baths`, `sqft`: minimums.
-- `maxPrice`: maximum.
+- `beds`, `baths`, `sqft`: minimums; `maxPrice`: maximum.
 - `type`: `Condominium` | `Townhouse` | `SingleFamilyResidence` | `UnimprovedLand`.
-- `pool`, `hasView`: `"1"` when required.
-- Missing filters are optional.
+- `pool`, `hasView`: `"1"` when required; missing filters optional.
 
-## Results
+## Listing Results
 
-- Default `limit: 10`, `page: 1`.
-- If N requested, set `limit: N` (max 50).
-- Preserve filters when changing only pagination or result count.
-- Active listings are sorted by ascending price.
-- Successful searches replace `lastResults`, including empty results.
-- Failed searches preserve previous results.
+- Default `limit: 10`, `page: 1`; maximum limit 50.
+- Preserve filters when changing pagination or result count.
+- Results sort by ascending price.
+- Successful searches replace `lastResults`; failed searches preserve them.
 - Show address, price, beds, baths, sqft, and relevant details.
-- For no matches, suggest relaxing constraints.
-- Summarize MCP errors without exposing SQL details.
+- Suggest relaxing filters when no listings match.
+
+## Market Statistics
+
+- `get_city_market_summary({city})`: sold count, average/median close price, price/sqft, DOM, list-to-close %, active inventory, inventory-to-sales ratio, and YoY price change.
+- `get_price_trend({city, months?})`: monthly sales, average price, DOM, and MoM price change.
+- Use `months: 12` for 12-month trend requests.
+- Use the requested city or established context; clarify if unknown.
+- Market tools do not modify listing sessions.
+- Distinguish average from median, MoM from YoY, and inventory from sales.
+- Never invent metrics or give definitive investment advice.
 
 ## Restrictions
 
-- Use MCP tools for all session and database operations.
-- Never execute the parser separately; `update_session` handles parsing.
-- Never pass filters directly to `search_active_listings`; it reads session filters.
-- Never access MySQL, credentials, or `query_db.ts` directly.
+- Use MCP tools exclusively for session and database operations.
+- Never run the parser or access MySQL directly.
+- Never pass filters to `search_active_listings`; it reads session state.
 - Do not substitute web results for MLS data.
-- Confirm updates using MCP responses.
+- Summarize MCP errors without exposing SQL or credentials.
+- Confirm session updates using MCP responses.

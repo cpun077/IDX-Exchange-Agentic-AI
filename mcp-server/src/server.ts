@@ -1,20 +1,19 @@
 import { McpServer } from "@modelcontextprotocol/server";
 import { StdioServerTransport } from "@modelcontextprotocol/server/stdio";
 import { z } from "zod/v4";
-import { searchActiveListings, getSoldComps } from "../../skills/property-search/scripts/query_db.js";
+import { searchActiveListings, getSoldComps, pool } from "../../skills/property-search/scripts/query_db.js";
 import { getSession, updateSession, clearSession, saveResults } from "../../skills/property-search/scripts/user_session.js";
 import { parsePropertyQuery } from "../../skills/property-search/scripts/text_parser.js";
+import { getCityMarketSummary, getPriceTrend } from "../../skills/property-search/scripts/market_stats.js";
 
 const server = new McpServer({ name: "property-search", version: "1.0.0" });
 
-const VALID_TYPES = [
-  "Condominium",
-  "Townhouse",
-  "SingleFamilyResidence",
-  "UnimprovedLand",
-] as const;
+// logging
+import { appendFileSync } from "node:fs";
 
-
+const log = (event: string) =>
+  appendFileSync("/tmp/property-mcp.log", `${event} PID=${process.pid}\n`);
+//
 
 server.registerTool(
   "search_active_listings",
@@ -92,6 +91,7 @@ server.registerTool(
   },
   async ({ sessionId }) => {
     try {
+      log("GET_SESSION");
       const session = getSession(sessionId);
       return {
         content: [{ type: "text" as const, text: JSON.stringify(session, null, 2) }],
@@ -121,6 +121,7 @@ server.registerTool(
   },
   async ({ sessionId, queryText }) => {
     try {
+      log("UPDATE_SESSION"); // logging
       const parsed = parsePropertyQuery(queryText);
       const session = updateSession(sessionId, parsed);
       return {
@@ -150,7 +151,7 @@ server.registerTool(
   },
   async ({ sessionId }) => {
     try {
-      clearSession(sessionId);
+      clearSession(sessionId); // logging
       return {
         content: [{ type: "text" as const, text: `Session ${sessionId} cleared successfully.` }],
       };
@@ -168,7 +169,61 @@ server.registerTool(
   }
 );
 
+server.registerTool(
+  "get_city_market_summary",
+  {
+    description: "Get market summary for the top 25 cities from the past 12 months (sale count, avg price, price per sqft, days on market, list-to-close ratio).",
+    inputSchema: z.object({
+      city: z.string()
+    }),
+  },
+  async ({ city }) => {
+    try {
+      const rows = await getCityMarketSummary(pool, city);
+      return {
+        content: [{ type: "text" as const, text: JSON.stringify(rows, null, 2) }],
+      };
+    } catch (err) {
+      return {
+        isError: true,
+        content: [{
+          type: "text" as const,
+          text: `Database error: ${err instanceof Error ? err.message : "unknown error"}`,
+        }],
+      };
+    }
+  }
+);
+
+server.registerTool(
+  "get_price_trend",
+  {
+    description: "Get monthly price trend and statistics for a city with month-over-month price change percentage.",
+    inputSchema: z.object({
+      city: z.string(),
+      months: z.number().int().positive().max(60).default(24),
+    }),
+  },
+  async ({ city, months }) => {
+    try {
+      const rows = await getPriceTrend(pool, city, months);
+      return {
+        content: [{ type: "text" as const, text: JSON.stringify(rows, null, 2) }],
+      };
+    } catch (err) {
+      return {
+        isError: true,
+        content: [{
+          type: "text" as const,
+          text: `Database error: ${err instanceof Error ? err.message : "unknown error"}`,
+        }],
+      };
+    }
+  }
+);
+
 async function main() {
+  log("START"); // logging
   const transport = new StdioServerTransport();
   await server.connect(transport);
   console.error("property-search MCP server running on stdio");
