@@ -5,6 +5,7 @@ import { searchActiveListings, getSoldComps, pool } from "../../skills/property-
 import { getSession, updateSession, clearSession, saveResults } from "../../skills/property-search/scripts/user_session.js";
 import { parsePropertyQuery } from "../../skills/property-search/scripts/text_parser.js";
 import { getCityMarketSummary, getPriceTrend } from "../../skills/property-search/scripts/market_stats.js";
+import { semanticSearch } from "../../skills/property-search/scripts/embeddings.js";
 
 const server = new McpServer({ name: "property-search", version: "1.0.0" });
 
@@ -49,7 +50,6 @@ server.registerTool(
     }
   }
 );
-
 
 server.registerTool(
   "get_sold_comps",
@@ -216,6 +216,34 @@ server.registerTool(
         content: [{
           type: "text" as const,
           text: `Database error: ${err instanceof Error ? err.message : "unknown error"}`,
+        }],
+      };
+    }
+  }
+);
+
+server.registerTool(
+  "semantic_property_search",
+  {
+    description: "Semantic MLS search. Call ONCE per user request with the original query, optional city, and user-requested limit (default 5). Do not rewrite queries, retry for better rankings, or rerank results.",
+    inputSchema: z.object({
+      query: z.string().min(1),
+      city: z.string().optional(),
+      limit: z.number().int().positive().max(50).default(10),
+    }),
+  },
+  async ({ query, city, limit }) => {
+    try {
+      const rows = await semanticSearch(pool, query, city, limit);
+      return {
+        content: [{ type: "text" as const, text: JSON.stringify(rows, null, 2) }],
+      };
+    } catch (err) {
+      return {
+        isError: true,
+        content: [{
+          type: "text" as const,
+          text: `Semantic search error: ${err instanceof Error ? err.message : "unknown error"}`,
         }],
       };
     }

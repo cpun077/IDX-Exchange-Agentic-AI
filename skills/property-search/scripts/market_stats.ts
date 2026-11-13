@@ -1,4 +1,3 @@
-
 import type { Pool, Connection, RowDataPacket } from "mysql2/promise";
 
 type Database = Pool | Connection;
